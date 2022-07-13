@@ -40,9 +40,8 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private async void CalcularButton_ClickAsync(object sender, RoutedEventArgs e)
+    private async void calcularButton_Click(object sender, RoutedEventArgs e)
     {
-        string result = await MainViewModel.ObterConsumos();
-        infoRun.Text = result;
+        infoRun.Text = await MainViewModel.ObterConsumosAsync();
     }
 }

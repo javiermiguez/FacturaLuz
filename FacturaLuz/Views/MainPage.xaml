@@ -14,7 +14,7 @@
             <CalendarDatePicker Name="finDatePicker" Margin="10,0,10,0" PlaceholderText="Fin" Width="150" IsTodayHighlighted="False"
                                 DateFormat="{}{day.integer(2)}/{month.integer(2)}/{year.full}" FirstDayOfWeek="Monday"
                                 Opened="finDatePicker_Opened"/>
-            <Button Name="calcularButton" Width="150" Style="{StaticResource AccentButtonStyle}" Click="CalcularButton_ClickAsync">
+            <Button Name="calcularButton" Width="150" Style="{StaticResource AccentButtonStyle}" Click="calcularButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Play"/>
                     <TextBlock Text="Calcular" Margin="10,0,0,0"/>
