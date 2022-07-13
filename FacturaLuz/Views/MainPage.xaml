@@ -1,0 +1,41 @@
+﻿<Page
+    x:Class="FacturaLuz.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <RelativePanel>
+        <StackPanel Name="inputStackPanel" Orientation="Horizontal" Margin="10,10,10,10" VerticalAlignment="Bottom">
+            <CalendarDatePicker Name="inicioDatePicker" PlaceholderText="Inicio" Width="150" IsTodayHighlighted="False"
+                                DateFormat="{}{day.integer(2)}/{month.integer(2)}/{year.full}" FirstDayOfWeek="Monday"
+                                Opened="inicioDatePicker_Opened"/>
+            <CalendarDatePicker Name="finDatePicker" Margin="10,0,10,0" PlaceholderText="Fin" Width="150" IsTodayHighlighted="False"
+                                DateFormat="{}{day.integer(2)}/{month.integer(2)}/{year.full}" FirstDayOfWeek="Monday"
+                                Opened="finDatePicker_Opened"/>
+            <Button Name="calcularButton" Width="150" Style="{StaticResource AccentButtonStyle}" Click="CalcularButton_ClickAsync">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Play"/>
+                    <TextBlock Text="Calcular" Margin="10,0,0,0"/>
+                </StackPanel>
+            </Button>
+            <ProgressRing Name="progresoProgressRing" IsIndeterminate="False" Margin="10,0,0,0" Visibility="Collapsed"/>
+        </StackPanel>
+        <Border BorderThickness="1" BorderBrush="{ThemeResource ComboBoxBorderThemeBrush}" CornerRadius="{ThemeResource ControlCornerRadius}"
+                Margin="10,0,10,20"
+                RelativePanel.Below="inputStackPanel"
+                RelativePanel.AlignLeftWithPanel="True"
+                RelativePanel.AlignRightWithPanel="True"
+                RelativePanel.AlignBottomWithPanel="True">
+            <RichTextBlock FontFamily="Consolas">
+                <Paragraph>
+                    <Run x:Name="infoRun"></Run>
+                </Paragraph>
+                <Paragraph>
+                    <Run x:Name="facturaRun"></Run>
+                </Paragraph>
+            </RichTextBlock>
+        </Border>
+    </RelativePanel>
+</Page>

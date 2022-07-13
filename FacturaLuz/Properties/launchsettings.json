@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "FacturaLuz (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "FacturaLuz (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
