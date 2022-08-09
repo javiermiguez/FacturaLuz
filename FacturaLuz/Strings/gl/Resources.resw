@@ -141,4 +141,16 @@
   <data name="Settings_URLMedidor.Header" xml:space="preserve">
     <value>URL medidor</value>
   </data>
+  <data name="abrirCartafolLocalTextBlock.Text" xml:space="preserve">
+    <value>Abrir cartafol local</value>
+  </data>
+  <data name="calcularTextBlock.Text" xml:space="preserve">
+    <value>Calcular</value>
+  </data>
+  <data name="finDatePicker.PlaceholderText" xml:space="preserve">
+    <value>Fin</value>
+  </data>
+  <data name="inicioDatePicker.PlaceholderText" xml:space="preserve">
+    <value>Inicio</value>
+  </data>
 </root>

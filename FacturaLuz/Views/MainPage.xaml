@@ -8,20 +8,26 @@
 
     <RelativePanel>
         <StackPanel Name="inputStackPanel" Orientation="Horizontal" Margin="10,10,10,10" VerticalAlignment="Bottom">
-            <CalendarDatePicker Name="inicioDatePicker" PlaceholderText="Inicio" Width="150" IsTodayHighlighted="False"
+            <CalendarDatePicker x:Uid="inicioDatePicker" Name="inicioDatePicker" Width="150" IsTodayHighlighted="False"
                                 DateFormat="{}{day.integer(2)}/{month.integer(2)}/{year.full}" FirstDayOfWeek="Monday"
                                 Opened="inicioDatePicker_Opened"/>
-            <CalendarDatePicker Name="finDatePicker" Margin="10,0,10,0" PlaceholderText="Fin" Width="150" IsTodayHighlighted="False"
+            <CalendarDatePicker x:Uid="finDatePicker" Name="finDatePicker" Margin="10,0,10,0" Width="150" IsTodayHighlighted="False"
                                 DateFormat="{}{day.integer(2)}/{month.integer(2)}/{year.full}" FirstDayOfWeek="Monday"
                                 Opened="finDatePicker_Opened"/>
             <Button Name="calcularButton" Width="150" Style="{StaticResource AccentButtonStyle}" Click="calcularButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Play"/>
-                    <TextBlock Text="Calcular" Margin="10,0,0,0"/>
+                    <TextBlock x:Uid="calcularTextBlock" Margin="10,0,0,0"/>
                 </StackPanel>
             </Button>
-            <ProgressRing Name="progresoProgressRing" IsIndeterminate="False" Margin="10,0,0,0" Visibility="Collapsed"/>
+            <ProgressRing Name="progresoProgressRing" IsIndeterminate="False" Maximum="100" Margin="10,0,0,0" Visibility="Collapsed"/>
         </StackPanel>
+        <Button Name="abrirCartafolLocalButton" Margin="10,10,10,0" RelativePanel.AlignRightWithPanel="True" Click="abrirCartafolLocalButton_Click">
+            <StackPanel Orientation="Horizontal">
+                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xed25;"/>
+                <TextBlock x:Uid="abrirCartafolLocalTextBlock" Margin="10,0,0,0"/>
+            </StackPanel>
+        </Button>
         <Border BorderThickness="1" BorderBrush="{ThemeResource ComboBoxBorderThemeBrush}" CornerRadius="{ThemeResource ControlCornerRadius}"
                 Margin="10,0,10,20"
                 RelativePanel.Below="inputStackPanel"
@@ -30,10 +36,12 @@
                 RelativePanel.AlignBottomWithPanel="True">
             <RichTextBlock FontFamily="Consolas">
                 <Paragraph>
-                    <Run x:Name="infoRun"></Run>
+                    <Run x:Name="facturaRun"/>
                 </Paragraph>
                 <Paragraph>
-                    <Run x:Name="facturaRun"></Run>
+                    <Run x:Name="infoRun"/>
+                    <Run x:Name="descargaRun"/>
+                    <Run x:Name="validacionRun" Foreground="Red"/>
                 </Paragraph>
             </RichTextBlock>
         </Border>
