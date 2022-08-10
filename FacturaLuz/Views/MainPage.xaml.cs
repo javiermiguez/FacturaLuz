@@ -13,9 +13,10 @@ using System.Threading.Tasks;
 using FacturaLuz.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System.Text.Json;
 using Windows.Storage;
 using System.Globalization;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace FacturaLuz.Views;
 
@@ -39,7 +40,7 @@ public sealed partial class MainPage : Page
         {
             get; set;
         }
-        public float PrezoWatioHora
+        public decimal PrezoWatioHora
         {
             get; set;
         }
@@ -84,43 +85,34 @@ public sealed partial class MainPage : Page
     private async void calcularButton_Click(object sender, RoutedEventArgs e)
     {
         infoRun.Text = "";
+        validacionRun.Text = "";
 
-        if (Validar())
-        {
-            progresoProgressRing.Visibility = Visibility.Visible;
-
-            infoRun.Text = "\n-------------------- INICIANDO PROCESO --------------------";
-
-            var dataInicio = new DateTime(inicioDatePicker.Date.Value.Year, inicioDatePicker.Date.Value.Month, inicioDatePicker.Date.Value.Day, 0, 0, 0);
-            var dataFin = new DateTime(inicioDatePicker.Date.Value.Year, inicioDatePicker.Date.Value.Month, inicioDatePicker.Date.Value.Day, 23, 59, 59);
-
-            await ObterConsumosAsync(dataInicio, dataFin);
-            await ObterPrezosAsync(dataInicio, dataFin);
-
-            CalcularFactura();
-        }
-    }
-
-    private bool Validar()
-    {
         if (!inicioDatePicker.Date.HasValue || !finDatePicker.Date.HasValue)
         {
             validacionRun.Text = "Selecciona as datas de inicio e fin.";
-            return false;
+            return;
         }
-        else if (inicioDatePicker.Date > finDatePicker.Date)
+        var dataInicio = new DateTime(inicioDatePicker.Date.Value.Year, inicioDatePicker.Date.Value.Month, inicioDatePicker.Date.Value.Day, 0, 0, 0);
+        var dataFin = new DateTime(finDatePicker.Date.Value.Year, finDatePicker.Date.Value.Month, finDatePicker.Date.Value.Day, 23, 59, 59);
+
+        if (dataInicio > dataFin)
         {
             validacionRun.Text = "A data de inicio ten que ser anterior ou igual á de fin.";
-            return false;
+            return;
         }
-        else if (finDatePicker.Date > DateTime.Now)
+        else if (dataFin > DateTime.Now)
         {
             validacionRun.Text = "A data de fin ten que ser menor ou igual á de hoxe.";
-            return false;
+            return;
         }
 
-        validacionRun.Text = "";
-        return true;
+        infoRun.Text = "\n-------------------- INICIANDO PROCESO --------------------";
+        progresoProgressRing.Visibility = Visibility.Visible;
+
+        await ObterConsumosAsync(dataInicio, dataFin);
+        await ObterPrezosAsync(dataInicio, dataFin);
+
+        CalcularFactura();
     }
 
     private async Task ObterConsumosAsync(DateTime dataInicio, DateTime dataFin)
@@ -265,24 +257,29 @@ public sealed partial class MainPage : Page
                 .Skip(1)
                 .Select(s => s.Split(new[] { ',' }))
                 .Select(c => new Consumo
-                {
-                    DataHora = TimeZoneInfo.ConvertTimeFromUtc(DateTime.Parse(c[0]), TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
-                    WatiosHora = decimal.Parse(c[1], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US"))
-                })
+                    {
+                        DataHora = TimeZoneInfo.ConvertTimeFromUtc(DateTime.Parse(c[0]), TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")),
+                        WatiosHora = decimal.Parse(c[1], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US"))
+                    })
                 .Where(c => c.DataHora >= dataInicio && c.DataHora <= dataFin)
-                .OrderBy(c => c.DataHora)
+                //.OrderBy(c => c.DataHora)
                 .ToList();
     }
 
     private void FiltrarPrezos(DateTimeOffset dataInicio, DateTimeOffset dataFin, string rutaLocal)
     {
-        Prezos = new List<Prezo>();
-
-        using StreamReader streamReader = new StreamReader(rutaLocal);
-
-        var json = streamReader.ReadToEnd();
-        //Prezos = JsonSerializer.Deserialize<List<Prezo>>(json);
-        Console.WriteLine("Ola");
+        using var streamReader = new StreamReader(rutaLocal);
+        var jObject = JObject.Parse(streamReader.ReadToEnd());
+        
+        Prezos = jObject["indicator"]["values"]
+                .Select(p => new Prezo
+                    {
+                        DataHora = (DateTime)p["datetime"],
+                        PrezoWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US"))
+                    })
+                .Where(p => p.DataHora >= dataInicio && p.DataHora <= dataFin)
+                //.OrderBy(p => p.DataHora)
+                .ToList();
     }
 
     private void CalcularFactura()
