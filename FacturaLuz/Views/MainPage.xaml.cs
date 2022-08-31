@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FacturaLuz.ViewModels;
@@ -16,7 +13,10 @@ using Microsoft.UI.Xaml.Controls;
 using Windows.Storage;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+using FacturaLuz.Helpers;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Documents;
 
 namespace FacturaLuz.Views;
 
@@ -61,71 +61,91 @@ public sealed partial class MainPage : Page
         InitializeComponent();
     }
 
-    private void abrirCartafolLocalButton_Click(object sender, RoutedEventArgs e)
+    private void AbrirCartafolLocal_Click(object sender, RoutedEventArgs e)
     {
         Process.Start("explorer.exe", ApplicationData.Current.LocalFolder.Path);
     }
 
-    private void finDatePicker_Opened(object sender, object e)
+    private void DataFin_Opened(object sender, object e)
     {
-        if (!finDatePicker.Date.HasValue)
+        if (!DataFin.Date.HasValue)
         {
-            finDatePicker.Date = DateTimeOffset.Now;
+            if (DataInicio.Date.HasValue)
+            {
+                DataFin.Date = DataInicio.Date.Value.AddDays(31);
+            }
+            else
+            {
+                DataFin.Date = DateTimeOffset.Now.AddDays(-1);
+            }
         }
     }
 
-    private void inicioDatePicker_Opened(object sender, object e)
+    private void DataInicio_Opened(object sender, object e)
     {
-        if (!inicioDatePicker.Date.HasValue)
+        if (!DataInicio.Date.HasValue)
         {
-            inicioDatePicker.Date = DateTimeOffset.Now.AddMonths(-1);
+            if (DataFin.Date.HasValue)
+            {
+                DataInicio.Date = DataFin.Date.Value.AddDays(-31);
+            }
+            else
+            { 
+                DataInicio.Date = DateTimeOffset.Now.AddMonths(-1).AddDays(-2);
+            }
         }
     }
 
-    private async void calcularButton_Click(object sender, RoutedEventArgs e)
+    private async void Calcular_Click(object sender, RoutedEventArgs e)
     {
-        infoRun.Text = "";
-        validacionRun.Text = "";
+        LogInfo.Text = "";
+        ValidacionInfo.Text = "";
+        GridFactura.Visibility = Visibility.Collapsed;
+        SeparadorFacturaLog.Visibility = Visibility.Collapsed;
 
-        if (!inicioDatePicker.Date.HasValue || !finDatePicker.Date.HasValue)
+        if (!DataInicio.Date.HasValue || !DataFin.Date.HasValue)
         {
-            validacionRun.Text = "Selecciona as datas de inicio e fin.";
+            ValidacionInfo.Text = ResourceExtensions.GetLocalized("Txt_SeleccionaInicioFin");
             return;
         }
-        var dataInicio = new DateTime(inicioDatePicker.Date.Value.Year, inicioDatePicker.Date.Value.Month, inicioDatePicker.Date.Value.Day, 0, 0, 0);
-        var dataFin = new DateTime(finDatePicker.Date.Value.Year, finDatePicker.Date.Value.Month, finDatePicker.Date.Value.Day, 23, 59, 59);
+        var dataInicio = new DateTime(DataInicio.Date.Value.Year, DataInicio.Date.Value.Month, DataInicio.Date.Value.Day, 0, 0, 0).AddDays(1); // A data de inicio exclúese da facturación
+        var dataFin = new DateTime(DataFin.Date.Value.Year, DataFin.Date.Value.Month, DataFin.Date.Value.Day, 23, 59, 59);
 
-        if (dataInicio > dataFin)
+        if (dataInicio >= dataFin)
         {
-            validacionRun.Text = "A data de inicio ten que ser anterior ou igual á de fin.";
+            ValidacionInfo.Text = ResourceExtensions.GetLocalized("Txt_InicioAnteriorFin");
             return;
         }
         else if (dataFin > DateTime.Now)
         {
-            validacionRun.Text = "A data de fin ten que ser menor ou igual á de hoxe.";
+            ValidacionInfo.Text = ResourceExtensions.GetLocalized("Txt_FinAnteriorHoxe");
             return;
         }
 
-        infoRun.Text = "\n-------------------- INICIANDO PROCESO --------------------";
-        progresoProgressRing.Visibility = Visibility.Visible;
+        LogInfo.Text = ResourceExtensions.GetLocalized("Txt_InicioLog");
+        Progreso.Visibility = Visibility.Visible;
 
         await ObterConsumosAsync(dataInicio, dataFin);
         await ObterPrezosAsync(dataInicio, dataFin);
+        //await Task.Run(() => CalcularFactura(dataInicio, dataFin));
+        CalcularFactura(dataInicio, dataFin);
 
-        CalcularFactura();
+        GridFactura.Visibility = Visibility.Visible;
+        SeparadorFacturaLog.Visibility = Visibility.Visible;
+        
     }
 
     private async Task ObterConsumosAsync(DateTime dataInicio, DateTime dataFin)
     {
         var rutaLocal = ApplicationData.Current.LocalFolder.Path + "\\em_data.csv";
 
-        infoRun.Text += "\n- Comprobando se existe o arquivo de consumos: " + rutaLocal;
+        LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_ExisteArquivoConsumos"), rutaLocal);
 
         bool necesarioDescargarArquivo;
 
         if (File.Exists(rutaLocal))
         {
-            infoRun.Text += "\n- Arquivo atopado. Comprobando se contén as datas requiridas...";
+            LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivoAtopadoBuscandoDatas");
 
             FiltrarConsumos(dataInicio, dataFin, rutaLocal);
 
@@ -134,20 +154,20 @@ public sealed partial class MainPage : Page
 
             if (existeDataInicio && existeDataFin)
             {
-                infoRun.Text += "\n- Atopados " + Consumos.Count.ToString() + " rexistros entre as datas indicadas.";
+                LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_NRexistrosEntreDatas"), Consumos.Count);
                 necesarioDescargarArquivo = false;
             }
             else
             {
-                infoRun.Text += "\n- Datas non atopadas.";
+                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_DatasNonAtopadas");
                 File.Delete(rutaLocal);
-                infoRun.Text += "\n- Arquivo eliminado. Procedendo coa descarga do arquivo...";
+                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivoEliminadoDescargando");
                 necesarioDescargarArquivo = true;
             }
         }
         else
         {
-            infoRun.Text += "\n- Arquivo non atopado. Procedendo coa descarga...";
+            LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivoNonAtopadoDescargando");
             necesarioDescargarArquivo = true;
         }
 
@@ -157,7 +177,7 @@ public sealed partial class MainPage : Page
 
             if (url == null)
             {
-                infoRun.Text += "\n- Atopouse un problema: A URL do medidor non está gardada na configuración.";
+                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_URLMedidorNonGardada");
             }
             else
             {
@@ -174,11 +194,11 @@ public sealed partial class MainPage : Page
                 {
                     App.httpClient.DefaultRequestHeaders.Clear();
                     await DescargarArquivoAsync(url, rutaLocal, cancellationToken.Token);
-                    infoRun.Text += "\n- Descarga completada.";
+                    LogInfo.Text += ResourceExtensions.GetLocalized("Txt_DescargaCompletada");
                 }
                 catch (HttpRequestException e)
                 {
-                    infoRun.Text = "\n- Produciuse un erro durante a descarga: " + e.Message;
+                    LogInfo.Text = string.Format(ResourceExtensions.GetLocalized("Txt_ErroDescarga"), e.Message);
                 }
             }
 
@@ -188,41 +208,43 @@ public sealed partial class MainPage : Page
 
     private async Task ObterPrezosAsync(DateTime dataInicio, DateTime dataFin)
     {
-        var rutaLocal = ApplicationData.Current.LocalFolder.Path + "\\1001.json";
+        var rutaLocalPrezosTotais = ApplicationData.Current.LocalFolder.Path + "\\1001.json";
+        var rutaLocalPrezosPeaxes = ApplicationData.Current.LocalFolder.Path + "\\1876.json";
+        var rutaLocalPeriodos = ApplicationData.Current.LocalFolder.Path + "\\1002.json";
 
-        infoRun.Text += "\n\n- Comprobando se existe o arquivo de prezos: " + rutaLocal;
+        LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_ExistenArquivosPrezos"), rutaLocalPrezosTotais, rutaLocalPrezosPeaxes, rutaLocalPeriodos);
 
-        bool necesarioDescargarArquivo;
+        bool necesarioDescargarArquivos;
 
-        if (File.Exists(rutaLocal))
+        if (File.Exists(rutaLocalPrezosTotais) && File.Exists(rutaLocalPrezosPeaxes) && File.Exists(rutaLocalPeriodos))
         {
-            infoRun.Text += "\n- Arquivo atopado. Comprobando se contén as datas requiridas...";
+            LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivosAtopadosBuscandoDatas");
 
-            FiltrarPrezos(dataInicio, dataFin, rutaLocal);
+            FiltrarPrezos(dataInicio, dataFin, rutaLocalPrezosTotais);
 
             var existeDataInicio = Prezos.Any(p => p.DataHora.Date == dataInicio.Date && p.DataHora.Hour == 0);
             var existeDataFin = Prezos.Any(p => p.DataHora.Date == dataFin.Date && p.DataHora.Hour == 23);
 
             if (existeDataInicio && existeDataFin)
             {
-                infoRun.Text += "\n- Atopados " + Prezos.Count.ToString() + " rexistros entre as datas indicadas.";
-                necesarioDescargarArquivo = false;
+                LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_NRexistrosEntreDatas"), Prezos.Count);
+                necesarioDescargarArquivos = false;
             }
             else
             {
-                infoRun.Text += "\n- Datas non atopadas.";
-                File.Delete(rutaLocal);
-                infoRun.Text += "\n- Arquivo eliminado. Procedendo coa descarga do arquivo...";
-                necesarioDescargarArquivo = true;
+                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_DatasNonAtopadas");
+                File.Delete(rutaLocalPrezosTotais);
+                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivoEliminadoDescargando");
+                necesarioDescargarArquivos = true;
             }
         }
         else
         {
-            infoRun.Text += "\n- Arquivo non atopado. Procedendo coa descarga...";
-            necesarioDescargarArquivo = true;
+            LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivosNonAtopadosDescargando");
+            necesarioDescargarArquivos = true;
         }
 
-        if (necesarioDescargarArquivo)
+        if (necesarioDescargarArquivos)
         {
             var url = "https://api.esios.ree.es/indicators/1001?"
                 + "start_date=" + dataInicio.Date.Year + "-" + dataInicio.Date.Month + "-" + dataInicio.Date.Day + "T00:00:00&"
@@ -239,15 +261,15 @@ public sealed partial class MainPage : Page
                 App.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", @"token=""***REMOVED***""");
                 App.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                await DescargarArquivoAsync(url, rutaLocal, cancellationToken.Token);
-                infoRun.Text += "\n- Descarga completada.";
+                await DescargarArquivoAsync(url, rutaLocalPrezosTotais, cancellationToken.Token);
+                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_DescargaCompletada");
             }
             catch (HttpRequestException e)
             {
-                infoRun.Text = "\n- Produciuse un erro durante a descarga: " + e.Message;
+                LogInfo.Text = string.Format(ResourceExtensions.GetLocalized("Txt_ErroDescarga"), e.Message);
             }
 
-            FiltrarPrezos(dataInicio, dataFin, rutaLocal);
+            FiltrarPrezos(dataInicio, dataFin, rutaLocalPrezosTotais);
         }
     }
 
@@ -262,11 +284,21 @@ public sealed partial class MainPage : Page
                         WatiosHora = decimal.Parse(c[1], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US"))
                     })
                 .Where(c => c.DataHora >= dataInicio && c.DataHora <= dataFin)
-                //.OrderBy(c => c.DataHora)
+                .GroupBy(c => new
+                                {
+                                    Data = c.DataHora.Date,
+                                    Hora = c.DataHora.Hour
+                                })
+                .Select(c => new Consumo
+                {
+                    DataHora = c.Key.Data.AddHours(c.Key.Hora),
+                    WatiosHora = c.Sum(c => c.WatiosHora)
+                })
+                .OrderBy(c => c.DataHora)
                 .ToList();
     }
 
-    private void FiltrarPrezos(DateTimeOffset dataInicio, DateTimeOffset dataFin, string rutaLocal)
+    private void FiltrarPrezos(DateTime dataInicio, DateTime dataFin, string rutaLocal)
     {
         using var streamReader = new StreamReader(rutaLocal);
         var jObject = JObject.Parse(streamReader.ReadToEnd());
@@ -275,17 +307,117 @@ public sealed partial class MainPage : Page
                 .Select(p => new Prezo
                     {
                         DataHora = (DateTime)p["datetime"],
-                        PrezoWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US"))
+                        PrezoWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US")) / 1000000
                     })
                 .Where(p => p.DataHora >= dataInicio && p.DataHora <= dataFin)
-                //.OrderBy(p => p.DataHora)
+                .OrderBy(p => p.DataHora)
                 .ToList();
     }
 
-    private void CalcularFactura()
+    private void CalcularFactura(DateTime dataInicio, DateTime dataFin)
     {
-        //Product product = await response.Content.ReadAsAsync > Product > ();
-        //Console.WriteLine("{0}\t${1}\t{2}", product.Name, product.Price, product.Category);
+        var config = App.GetService<SettingsViewModel>();
+
+        decimal diasFactura = (dataFin - dataInicio).Days + 1; // + 1 porque a hora de dataFin son as 23:59:59, así que non conta ese día como enteiro e hai que engadilo
+        decimal diasAnoDataFin = DateTime.IsLeapYear(dataFin.Year) ? 366 : 365;
+        var termoFixoPeaxesTDCPuntaResultado = config.PotenciaContratada * config.TermoFixoPeaxesTDCPunta * (diasFactura / diasAnoDataFin);
+        var termoFixoPeaxesTDCValResultado = config.PotenciaContratada * config.TermoFixoPeaxesTDCVal * (diasFactura / diasAnoDataFin);
+        var termoFixoMarxeComercializacionResultado = config.PotenciaContratada * config.MarxeComercializacion * (diasFactura / diasAnoDataFin);
+        var termoFixoResultado = termoFixoPeaxesTDCPuntaResultado + termoFixoPeaxesTDCValResultado + termoFixoMarxeComercializacionResultado;
+
+        var ConsumosPrezos = Consumos.Join(Prezos,
+                                            c => c.DataHora,
+                                            p => p.DataHora,
+                                            (Consumo, Prezo) => new { Consumo.DataHora, Consumo.WatiosHora, Prezo.PrezoWatioHora }
+                                          )
+                                          .ToList();
+
+        var termoVariableResultado = ConsumosPrezos.Sum(cp => cp.WatiosHora * cp.PrezoWatioHora);
+        var kWhConsumidosPunta = (decimal)0; //ConsumoPrezos.Where(cp => cp.DataHora IN XXX).Sum(cp => cp.WatiosHora);
+        var kWhConsumidosChan = (decimal)0;
+        var kWhConsumidosVal = (decimal)0;
+        var termoVariablePeaxesTDCPuntaResultado = kWhConsumidosPunta * 1;
+        var termoVariablePeaxesTDCChanResultado = kWhConsumidosChan * 1;
+        var termoVariablePeaxesTDCValResultado = kWhConsumidosVal * 1;
+        var numeroPrezosDiferentes = ConsumosPrezos.Count();
+        var custeEnerxiaResultado = termoVariableResultado - termoVariablePeaxesTDCPuntaResultado - termoVariablePeaxesTDCChanResultado - termoVariablePeaxesTDCValResultado;
+
+        var bonoSocialTermoFixoResultado = termoFixoResultado * config.DescontoBonoSocial / 100;
+        var kWhConsumidos = ConsumosPrezos.Sum(cp => cp.WatiosHora) / 1000;
+        var kWhBonificables = (config.LimiteBonoSocial / diasAnoDataFin) * diasFactura;
+        var bonoSocialTermoVariableResultado = termoVariableResultado * (kWhBonificables / kWhConsumidos) * (config.DescontoBonoSocial / 100);
+        var bonoSocialResultado = bonoSocialTermoFixoResultado + bonoSocialTermoVariableResultado;
+
+        var impostoElectricidadeBaseImpoñible = termoFixoResultado + termoVariableResultado - bonoSocialResultado;
+        var impostoElectricidadeResultado = impostoElectricidadeBaseImpoñible * config.ImpostoElectricidade / 100;
+        var alugueiroContadorResultado = diasFactura * config.AlugueiroContador;
+        var iveBaseImpoñible = impostoElectricidadeBaseImpoñible + impostoElectricidadeResultado + alugueiroContadorResultado;
+        var iveResultado = iveBaseImpoñible * config.Ive / 100;
+
+        var totalResultado = iveBaseImpoñible + iveResultado;
+
+        EscribirFragmentoFactura(Titulo_Texto, dataInicio.AddDays(-1).ToString("dd/MM/yyyy"), dataFin.ToString("dd/MM/yyyy"));
+
+        EscribirFragmentoFactura(TermoFixo_Texto);
+        EscribirFragmentoFactura(TermoFixo_Resultado, Math.Round(termoFixoResultado, 2));
+        EscribirFragmentoFactura(TermoFixoPeaxesTDC_Texto);
+        EscribirFragmentoFactura(TermoFixoPunta_Texto);
+        EscribirFragmentoFactura(TermoFixoPunta_Calculo, config.PotenciaContratada, config.TermoFixoPeaxesTDCPunta, diasFactura, diasAnoDataFin);
+        EscribirFragmentoFactura(TermoFixoPunta_Resultado, Math.Round(termoFixoPeaxesTDCPuntaResultado, 2));
+        EscribirFragmentoFactura(TermoFixoVal_Texto);
+        EscribirFragmentoFactura(TermoFixoVal_Calculo, config.PotenciaContratada, config.TermoFixoPeaxesTDCVal, diasFactura, diasAnoDataFin);
+        EscribirFragmentoFactura(TermoFixoVal_Resultado, Math.Round(termoFixoPeaxesTDCValResultado, 2));
+        EscribirFragmentoFactura(TermoFixoMarxe_Texto);
+        EscribirFragmentoFactura(TermoFixoMarxe_Calculo, config.PotenciaContratada, config.MarxeComercializacion, diasFactura, diasAnoDataFin);
+        EscribirFragmentoFactura(TermoFixoMarxe_Resultado, Math.Round(termoFixoMarxeComercializacionResultado, 2));
+
+        EscribirFragmentoFactura(TermoVariable_Texto);
+        EscribirFragmentoFactura(TermoVariable_Resultado, Math.Round(termoVariableResultado, 2));
+        EscribirFragmentoFactura(TermoVariablePeaxesTDC_Texto);
+        EscribirFragmentoFactura(TermoVariablePunta_Texto);
+        EscribirFragmentoFactura(TermoVariablePunta_Calculo, "?", "?");
+        EscribirFragmentoFactura(TermoVariablePunta_Resultado, "?"); //Math.Round(termoVariablePeaxesTDCPuntaResultado, 2));
+        EscribirFragmentoFactura(TermoVariableChan_Texto);
+        EscribirFragmentoFactura(TermoVariableChan_Calculo, "?", "?");
+        EscribirFragmentoFactura(TermoVariableChan_Resultado, "?"); //Math.Round(termoVariablePeaxesTDCChanResultado, 2));
+        EscribirFragmentoFactura(TermoVariableVal_Texto);
+        EscribirFragmentoFactura(TermoVariableVal_Calculo, "?", "?");
+        EscribirFragmentoFactura(TermoVariableVal_Resultado, "?"); //Math.Round(termoVariablePeaxesTDCValResultado, 2));
+        EscribirFragmentoFactura(TermoVariableCusteEnerxia_Texto);
+        EscribirFragmentoFactura(TermoVariableCusteEnerxia_Calculo, numeroPrezosDiferentes);
+        EscribirFragmentoFactura(TermoVariableCusteEnerxia_Resultado, Math.Round(custeEnerxiaResultado, 2));
+
+        EscribirFragmentoFactura(BonoSocial_Texto);
+        EscribirFragmentoFactura(BonoSocial_Resultado, -Math.Round(bonoSocialResultado, 2));
+        EscribirFragmentoFactura(BonoSocialTermoFixo_Texto);
+        EscribirFragmentoFactura(BonoSocialTermoFixo_Calculo, Math.Round(termoFixoResultado, 2), config.DescontoBonoSocial);
+        EscribirFragmentoFactura(BonoSocialTermoFixo_Resultado, -Math.Round(bonoSocialTermoFixoResultado, 2));
+        EscribirFragmentoFactura(BonoSocialTermoVariable_Texto);
+        EscribirFragmentoFactura(BonoSocialTermoVariable_Calculo, Math.Round(termoVariableResultado, 2), Math.Round(kWhBonificables, 0),
+                                 Math.Round(kWhConsumidos, 0), config.DescontoBonoSocial);
+        EscribirFragmentoFactura(BonoSocialTermoVariable_Resultado, -Math.Round(bonoSocialTermoVariableResultado, 2));
+
+        EscribirFragmentoFactura(ImpostoElectricidade_Texto);
+        EscribirFragmentoFactura(ImpostoElectricidade_Calculo, Math.Round(impostoElectricidadeBaseImpoñible, 2), config.ImpostoElectricidade);
+        EscribirFragmentoFactura(ImpostoElectricidade_Resultado, Math.Round(impostoElectricidadeResultado, 2));
+
+        EscribirFragmentoFactura(AlugueiroContador_Texto);
+        EscribirFragmentoFactura(AlugueiroContador_Calculo, diasFactura, config.AlugueiroContador);
+        EscribirFragmentoFactura(AlugueiroContador_Resultado, Math.Round(alugueiroContadorResultado, 2));
+
+        EscribirFragmentoFactura(Ive_Texto);
+        EscribirFragmentoFactura(Ive_Calculo, Math.Round(iveBaseImpoñible, 2), config.Ive);
+        EscribirFragmentoFactura(Ive_Resultado, Math.Round(iveResultado, 2));
+
+        EscribirFragmentoFactura(Total_Texto);
+        EscribirFragmentoFactura(Total_Resultado, Math.Round(totalResultado, 2));
+    }
+
+    private void EscribirFragmentoFactura(Run seccionTexto, object arg0 = null, object arg1 = null, object arg2 = null, object arg3 = null, object arg4 = null)
+    {
+        var resourceKey = "Main_Factura_" + (seccionTexto.Name.EndsWith("_Resultado") ? "ResultadoLiña" : seccionTexto.Name);
+
+        seccionTexto.Text = string.Format(ResourceExtensions.GetLocalized(resourceKey), new object[] { arg0, arg1, arg2, arg3, arg4 });
     }
 
     private async Task DescargarArquivoAsync(string url, string rutaLocal, CancellationToken token)
@@ -294,7 +426,7 @@ public sealed partial class MainPage : Page
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception(string.Format("The request returned with HTTP status code {0}", response.StatusCode));
+            throw new Exception(string.Format(ResourceExtensions.GetLocalized("Txt_EstadoPeticionErro"), response.StatusCode));
         }
 
         var total = response.Content.Headers.ContentLength.HasValue ? response.Content.Headers.ContentLength.Value : -1L;
@@ -307,8 +439,8 @@ public sealed partial class MainPage : Page
 
         if (!canReportPercentProgress)
         {
-            progresoProgressRing.IsIndeterminate = true;
-            progresoProgressRing.IsActive = true;
+            Progreso.IsIndeterminate = true;
+            Progreso.IsActive = true;
         }
 
         do
@@ -335,20 +467,20 @@ public sealed partial class MainPage : Page
 
                 if (canReportPercentProgress)
                 {
-                    progresoProgressRing.Value = (totalRead * 1d) / (total * 1d) * 100;
+                    Progreso.Value = (totalRead * 1d) / (total * 1d) * 100;
                 }
                 else
                 {
-                    descargaRun.Text = "\n" + totalRead.ToString() + " bytes descargados";
+                    DescargaInfo.Text = string.Format(ResourceExtensions.GetLocalized("Txt_BytesDescargados"), totalRead);
                 }
             }
         } while (isMoreToRead);
 
         if (!canReportPercentProgress)
         {
-            infoRun.Text += descargaRun.Text;
-            descargaRun.Text = "";
-            progresoProgressRing.IsActive = false;
+            LogInfo.Text += DescargaInfo.Text;
+            DescargaInfo.Text = "";
+            Progreso.IsActive = false;
         }
     }
 }

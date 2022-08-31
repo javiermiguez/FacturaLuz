@@ -4,46 +4,328 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    NavigationCacheMode="Required">
 
     <RelativePanel>
-        <StackPanel Name="inputStackPanel" Orientation="Horizontal" Margin="10,10,10,10" VerticalAlignment="Bottom">
-            <CalendarDatePicker x:Uid="inicioDatePicker" Name="inicioDatePicker" Width="150" IsTodayHighlighted="False"
+        <StackPanel Name="PanelEntrada" Orientation="Horizontal" Margin="10,10,10,10" VerticalAlignment="Bottom">
+            <CalendarDatePicker x:Uid="Main_DataInicio" Name="DataInicio" Width="150" IsTodayHighlighted="False"
                                 DateFormat="{}{day.integer(2)}/{month.integer(2)}/{year.full}" FirstDayOfWeek="Monday"
-                                Opened="inicioDatePicker_Opened"/>
-            <CalendarDatePicker x:Uid="finDatePicker" Name="finDatePicker" Margin="10,0,10,0" Width="150" IsTodayHighlighted="False"
+                                Opened="DataInicio_Opened"/>
+            <CalendarDatePicker x:Uid="Main_DataFin" Name="DataFin" Margin="10,0,10,0" Width="150" IsTodayHighlighted="False"
                                 DateFormat="{}{day.integer(2)}/{month.integer(2)}/{year.full}" FirstDayOfWeek="Monday"
-                                Opened="finDatePicker_Opened"/>
-            <Button Name="calcularButton" Width="150" Style="{StaticResource AccentButtonStyle}" Click="calcularButton_Click">
+                                Opened="DataFin_Opened"/>
+            <Button Name="Calcular" Width="150" Style="{StaticResource AccentButtonStyle}" Click="Calcular_Click">
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Play"/>
-                    <TextBlock x:Uid="calcularTextBlock" Margin="10,0,0,0"/>
+                    <TextBlock x:Uid="Main_Calcular" Margin="10,0,0,0"/>
                 </StackPanel>
             </Button>
-            <ProgressRing Name="progresoProgressRing" IsIndeterminate="False" Maximum="100" Margin="10,0,0,0" Visibility="Collapsed"/>
+            <ProgressRing Name="Progreso" IsIndeterminate="False" Maximum="100" Margin="10,0,0,0" Visibility="Collapsed"/>
         </StackPanel>
-        <Button Name="abrirCartafolLocalButton" Margin="10,10,10,0" RelativePanel.AlignRightWithPanel="True" Click="abrirCartafolLocalButton_Click">
+        <Button Name="AbrirCartafolLocal" Margin="10,10,10,0" RelativePanel.AlignRightWith="BordeFacturaLog" Click="AbrirCartafolLocal_Click">
             <StackPanel Orientation="Horizontal">
                 <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xed25;"/>
-                <TextBlock x:Uid="abrirCartafolLocalTextBlock" Margin="10,0,0,0"/>
+                <TextBlock x:Uid="Main_AbrirCartafolLocal" Margin="10,0,0,0"/>
             </StackPanel>
         </Button>
-        <Border BorderThickness="1" BorderBrush="{ThemeResource ComboBoxBorderThemeBrush}" CornerRadius="{ThemeResource ControlCornerRadius}"
-                Margin="10,0,10,20"
-                RelativePanel.Below="inputStackPanel"
-                RelativePanel.AlignLeftWithPanel="True"
-                RelativePanel.AlignRightWithPanel="True"
-                RelativePanel.AlignBottomWithPanel="True">
-            <RichTextBlock FontFamily="Consolas">
-                <Paragraph>
-                    <Run x:Name="facturaRun"/>
-                </Paragraph>
-                <Paragraph>
-                    <Run x:Name="infoRun"/>
-                    <Run x:Name="descargaRun"/>
-                    <Run x:Name="validacionRun" Foreground="Red"/>
-                </Paragraph>
-            </RichTextBlock>
+        <Border Name="BordeFacturaLog" BorderThickness="1" BorderBrush="{ThemeResource ComboBoxBorderThemeBrush}" CornerRadius="{ThemeResource ControlCornerRadius}"
+                Width="900" Height="580" Margin="10,0,10,20" RelativePanel.Below="PanelEntrada">
+            <ScrollViewer Name="FacturaScrollViewer" Width="880" Height="560" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Enabled" Margin="10,10,10,10">
+                <StackPanel>
+                    <Grid Name="GridFactura" ColumnDefinitions="4*, 7*, Auto" RowDefinitions="*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*"
+                          Margin="10,10,20,10" Visibility="Collapsed">
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+                            <Paragraph>
+                                <Run x:Name="Titulo_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoFixo_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" HorizontalTextAlignment="Right" Grid.Row="1" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoFixo_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Margin="0,5,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoPeaxesTDC_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="3" Grid.Column="0">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoPunta_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="3" Grid.Column="1">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoPunta_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="3" Grid.Column="2">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoPunta_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="4" Grid.Column="0">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoVal_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="4" Grid.Column="1">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoVal_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="4" Grid.Column="2">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoVal_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="5" Grid.Column="0"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoMarxe_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="5" Grid.Column="1"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoMarxe_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="5" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoFixoMarxe_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariable_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" HorizontalTextAlignment="Right" Grid.Row="6" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariable_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Margin="0,5,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariablePeaxesTDC_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="8" Grid.Column="0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariablePunta_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="8" Grid.Column="1">
+                            <Paragraph>
+                                <Run x:Name="TermoVariablePunta_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="8" Grid.Column="2">
+                            <Paragraph>
+                                <Run x:Name="TermoVariablePunta_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="9" Grid.Column="0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableChan_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="9" Grid.Column="1">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableChan_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="9" Grid.Column="2">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableChan_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="10" Grid.Column="0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableVal_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="10" Grid.Column="1">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableVal_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="10" Grid.Column="2">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableVal_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="11" Grid.Column="0"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableCusteEnerxia_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="11" Grid.Column="1"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableCusteEnerxia_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="11" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="TermoVariableCusteEnerxia_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="BonoSocial_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" HorizontalTextAlignment="Right" Grid.Row="12" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="BonoSocial_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="13" Grid.Column="0">
+                            <Paragraph>
+                                <Run x:Name="BonoSocialTermoFixo_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="13" Grid.Column="1">
+                            <Paragraph>
+                                <Run x:Name="BonoSocialTermoFixo_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="13" Grid.Column="2">
+                            <Paragraph>
+                                <Run x:Name="BonoSocialTermoFixo_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="14" Grid.Column="0">
+                            <Paragraph>
+                                <Run x:Name="BonoSocialTermoVariable_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="14" Grid.Column="1">
+                            <Paragraph>
+                                <Run x:Name="BonoSocialTermoVariable_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" HorizontalTextAlignment="Right" Grid.Row="14" Grid.Column="2">
+                            <Paragraph>
+                                <Run x:Name="BonoSocialTermoVariable_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" Grid.Row="15" Grid.Column="0"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="ImpostoElectricidade_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="15" Grid.Column="1"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="ImpostoElectricidade_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" HorizontalTextAlignment="Right" Grid.Row="15" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="ImpostoElectricidade_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" Grid.Row="16" Grid.Column="0"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="AlugueiroContador_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="16" Grid.Column="1"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="AlugueiroContador_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" HorizontalTextAlignment="Right" Grid.Row="16" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="AlugueiroContador_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" Grid.Row="17" Grid.Column="0"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="Ive_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" Grid.Row="17" Grid.Column="1"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="Ive_Calculo"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" HorizontalTextAlignment="Right" Grid.Row="17" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="Ive_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" Foreground="Red" Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="Total_Texto"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                        <RichTextBlock VerticalAlignment="Bottom" FontFamily="Consolas" FontWeight="Bold" Foreground="Red" HorizontalTextAlignment="Right" Grid.Row="18" Grid.Column="2"
+                                       Margin="0,10,0,0">
+                            <Paragraph>
+                                <Run x:Name="Total_Resultado"/>
+                            </Paragraph>
+                        </RichTextBlock>
+                    </Grid>
+
+                    <Border Name="SeparadorFacturaLog" Height="1" Background="{ThemeResource ComboBoxBorderThemeBrush}" Margin="10,10,20,10" Visibility="Collapsed"/>
+
+                    <RichTextBlock Name="LogTextBlock" FontFamily="Consolas" Margin="10,0,20,10">
+                        <Paragraph>
+                            <Run x:Name="LogInfo"/>
+                            <Run x:Name="DescargaInfo"/>
+                            <Run x:Name="ValidacionInfo" Foreground="Red"/>
+                        </Paragraph>
+                    </RichTextBlock>
+                </StackPanel>
+            </ScrollViewer>
         </Border>
     </RelativePanel>
 </Page>

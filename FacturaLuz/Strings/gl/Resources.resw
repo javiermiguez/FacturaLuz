@@ -123,34 +123,280 @@
   <data name="AppDescription" xml:space="preserve">
     <value>FacturaLuz</value>
   </data>
-  <data name="Settings_Theme.Text" xml:space="preserve">
+  <data name="Settings_Theme/Text" xml:space="preserve">
     <value>Tema</value>
   </data>
-  <data name="Settings_Theme_Light.Content" xml:space="preserve">
+  <data name="Settings_Theme_Light/Content" xml:space="preserve">
     <value>Luminoso</value>
   </data>
-  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
+  <data name="Settings_Theme_Dark/Content" xml:space="preserve">
     <value>Escuro</value>
   </data>
-  <data name="Settings_Theme_Default.Content" xml:space="preserve">
+  <data name="Settings_Theme_Default/Content" xml:space="preserve">
     <value>Por defecto</value>
   </data>
-  <data name="Shell_Main.Content" xml:space="preserve">
+  <data name="Shell_Main/Content" xml:space="preserve">
     <value>Factura</value>
   </data>
-  <data name="Settings_URLMedidor.Header" xml:space="preserve">
+  <data name="Settings_URLMedidor/Header" xml:space="preserve">
     <value>URL medidor</value>
   </data>
-  <data name="abrirCartafolLocalTextBlock.Text" xml:space="preserve">
+  <data name="Main_AbrirCartafolLocal/Text" xml:space="preserve">
     <value>Abrir cartafol local</value>
   </data>
-  <data name="calcularTextBlock.Text" xml:space="preserve">
+  <data name="Main_Calcular/Text" xml:space="preserve">
     <value>Calcular</value>
   </data>
-  <data name="finDatePicker.PlaceholderText" xml:space="preserve">
+  <data name="Main_DataFin/PlaceholderText" xml:space="preserve">
     <value>Fin</value>
   </data>
-  <data name="inicioDatePicker.PlaceholderText" xml:space="preserve">
+  <data name="Main_DataInicio/PlaceholderText" xml:space="preserve">
     <value>Inicio</value>
+  </data>
+  <data name="Settings_AlugueiroContador/Header" xml:space="preserve">
+    <value>Alugueiro diario do contador (€)</value>
+  </data>
+  <data name="Settings_DescontoBonoSocial/Header" xml:space="preserve">
+    <value>Desconto por bono social (%)</value>
+  </data>
+  <data name="Settings_ImpostoElectricidade/Header" xml:space="preserve">
+    <value>Imposto da electricidade (%)</value>
+  </data>
+  <data name="Settings_Ive/Header" xml:space="preserve">
+    <value>IVE (%)</value>
+  </data>
+  <data name="Settings_LimiteBonoSocial/Header" xml:space="preserve">
+    <value>Límite de consumo anual (kWh)</value>
+  </data>
+  <data name="Settings_MarxeComercializacion/Header" xml:space="preserve">
+    <value>Marxe de comercialización fixa (€)</value>
+  </data>
+  <data name="Settings_PeaxesTDCPunta/Header" xml:space="preserve">
+    <value>Período punta (€)</value>
+  </data>
+  <data name="Settings_PeaxesTDCVal/Header" xml:space="preserve">
+    <value>Período val (€)</value>
+  </data>
+  <data name="Settings_PotenciaContratada/Header" xml:space="preserve">
+    <value>Potencia contratada (kW)</value>
+  </data>
+  <data name="Settings_TituloBonoSocial/Text" xml:space="preserve">
+    <value>Bono social</value>
+  </data>
+  <data name="Settings_TituloPeaxes/Text" xml:space="preserve">
+    <value>Peaxes de transporte e distribución e cargos</value>
+  </data>
+  <data name="Settings_InterruptorAxuda/Header" xml:space="preserve">
+    <value>Axuda</value>
+  </data>
+  <data name="Settings_InterruptorAxuda/OffContent" xml:space="preserve">
+    <value>Desactivada</value>
+  </data>
+  <data name="Settings_InterruptorAxuda/OnContent" xml:space="preserve">
+    <value>Activada</value>
+  </data>
+  <data name="Settings_URLMedidor_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Enderezo IP do dispositivo medidor ShellyEM. Complétase automaticamente con /emeter/1/em_data.csv
+Exemplo: http://192.168.1.128/</value>
+  </data>
+  <data name="Txt_ArquivoAtopadoBuscandoDatas" xml:space="preserve">
+    <value>
+- Arquivo atopado. Comprobando se contén as datas requiridas...</value>
+  </data>
+  <data name="Txt_ArquivoEliminadoDescargando" xml:space="preserve">
+    <value>
+- Arquivo eliminado. Procedendo coa descarga do arquivo...</value>
+  </data>
+  <data name="Txt_ArquivoNonAtopadoDescargando" xml:space="preserve">
+    <value>
+- Arquivo non atopado. Procedendo coa descarga...</value>
+  </data>
+  <data name="Txt_BytesDescargados" xml:space="preserve">
+    <value>
+ {0} bytes descargados</value>
+  </data>
+  <data name="Txt_DatasNonAtopadas" xml:space="preserve">
+    <value>
+- Datas non atopadas.</value>
+  </data>
+  <data name="Txt_DescargaCompletada" xml:space="preserve">
+    <value>
+- Descarga completada.</value>
+  </data>
+  <data name="Txt_ErroDescarga" xml:space="preserve">
+    <value>
+- Produciuse un erro durante a descarga: {0}</value>
+  </data>
+  <data name="Txt_EstadoPeticionErro" xml:space="preserve">
+    <value>A petición devolveu o código de estado HTTP {0}</value>
+  </data>
+  <data name="Txt_ExisteArquivoConsumos" xml:space="preserve">
+    <value>
+- Comprobando se existe o arquivo de consumos: {0}</value>
+  </data>
+  <data name="Txt_ExistenArquivosPrezos" xml:space="preserve">
+    <value>
+
+- Comprobando se existen os arquivos de prezos:
+{0}
+{1}
+{2}</value>
+  </data>
+  <data name="Txt_FinAnteriorHoxe" xml:space="preserve">
+    <value>A data de fin ten que ser anterior ou igual á de hoxe.</value>
+  </data>
+  <data name="Txt_InicioLog" xml:space="preserve">
+    <value>
+LOG:
+</value>
+  </data>
+  <data name="Txt_InicioAnteriorFin" xml:space="preserve">
+    <value>A data de inicio ten que ser anterior á de fin. Lembra que a data de inicio está excluída do cómputo da factura e a de fin está incluída.</value>
+  </data>
+  <data name="Txt_NRexistrosEntreDatas" xml:space="preserve">
+    <value>
+- Atopados {0} rexistros entre as datas indicadas.</value>
+  </data>
+  <data name="Txt_SeleccionaInicioFin" xml:space="preserve">
+    <value>Selecciona as datas de inicio e fin.</value>
+  </data>
+  <data name="Txt_URLMedidorNonGardada" xml:space="preserve">
+    <value>
+- Atopouse un problema: A URL do medidor non está gardada na configuración.</value>
+  </data>
+  <data name="Settings_AlugueiroContador_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Se a factura se paga entre varios, dividir este valor entre o número de pagadores. Exemplo: Se son 0,026667 € e se paga entre dous, gardar aquí 0,0133335.</value>
+  </data>
+  <data name="Settings_AxudaTeachingTip/CloseButtonContent" xml:space="preserve">
+    <value>Pechar</value>
+  </data>
+  <data name="Settings_DescontoBonoSocial_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Porcentaxe aplicable tanto ao termo fixo como ao variable da factura. Se non se ten bono social, gardar 0. Exemplo: 60.</value>
+  </data>
+  <data name="Settings_ImpostoElectricidade_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Porcentaxe que se aplica ao termo fixo e ao variable. Exemplo: 0,5.</value>
+  </data>
+  <data name="Settings_Ive_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Porcentaxe aplicable ao total da factura. Exemplo: 10.</value>
+  </data>
+  <data name="Settings_LimiteBonoSocial_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Consumo anual bonificable. Todo o que exceda deste límite vai sen desconto. Se non se ten bono social, este valor ignórase.
+Se a factura se paga entre varios, dividir este valor entre o número de pagadores. Exemplo: Se corresponde un límite de 1380 kWh e se paga entre dous, gardar aquí 690.</value>
+  </data>
+  <data name="Settings_MarxeComercializacion_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Para o cálculo do termo fixo, en €/kW e ano. Exemplo: 3,113.</value>
+  </data>
+  <data name="Settings_PeaxesTDCPunta_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Para o cálculo do termo fixo, en €/kW e ano. As peaxes e cargos do termo variable xa veñen incluídas nos prezos horarios que o programa descarga de REE. Exemplo: 26,164043.</value>
+  </data>
+  <data name="Settings_PeaxesTDCVal_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Para o cálculo do termo fixo, en €/kW e ano. As peaxes e cargos do termo variable xa veñen incluídas nos prezos horarios que o programa descarga de REE. Exemplo: 1,143132.</value>
+  </data>
+  <data name="Settings_PotenciaContratada_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Se a factura se paga entre varios, dividir este valor entre o número de pagadores. Exemplo: Se a potencia contratada son 3,45 kW e se paga entre dous, gardar aquí 1,725.</value>
+  </data>
+  <data name="Main_Factura_AlugueiroContador_Calculo" xml:space="preserve">
+    <value>{0} días x {1} €/día</value>
+  </data>
+  <data name="Main_Factura_AlugueiroContador_Texto" xml:space="preserve">
+    <value>Alugueiro do contador</value>
+  </data>
+  <data name="Main_Factura_BonoSocialTermoVariable_Calculo" xml:space="preserve">
+    <value>{0} € x ({1} kWh / {2} kWh) x {3} %</value>
+  </data>
+  <data name="Main_Factura_BonoSocialTermoVariable_Texto" xml:space="preserve">
+    <value>Desconto enerxía</value>
+  </data>
+  <data name="Main_Factura_BonoSocialTermoFixo_Calculo" xml:space="preserve">
+    <value>{0} € x {1} %</value>
+  </data>
+  <data name="Main_Factura_BonoSocialTermoFixo_Texto" xml:space="preserve">
+    <value>Desconto potencia</value>
+  </data>
+  <data name="Main_Factura_BonoSocial_Texto" xml:space="preserve">
+    <value>Desconto por bono social</value>
+  </data>
+  <data name="Main_Factura_ImpostoElectricidade_Calculo" xml:space="preserve">
+    <value>{0} € x {1} %</value>
+  </data>
+  <data name="Main_Factura_ImpostoElectricidade_Texto" xml:space="preserve">
+    <value>Imposto electricidade</value>
+  </data>
+  <data name="Main_Factura_Ive_Calculo" xml:space="preserve">
+    <value>{0} € x {1} %</value>
+  </data>
+  <data name="Main_Factura_Ive_Texto" xml:space="preserve">
+    <value>IVE</value>
+  </data>
+  <data name="Main_Factura_ResultadoLiña" xml:space="preserve">
+    <value>{0} €</value>
+  </data>
+  <data name="Main_Factura_TermoFixoMarxe_Calculo" xml:space="preserve">
+    <value>{0} kW x {1} €/kW e ano x ({2}/{3} días)</value>
+  </data>
+  <data name="Main_Factura_TermoFixoMarxe_Texto" xml:space="preserve">
+    <value>Marxe de comercialización fixa</value>
+  </data>
+  <data name="Main_Factura_TermoFixoPeaxesTDC_Texto" xml:space="preserve">
+    <value>Importe por peaxes de transporte e distribución e cargos</value>
+  </data>
+  <data name="Main_Factura_TermoFixoPunta_Calculo" xml:space="preserve">
+    <value>{0} kW x {1} €/kW e ano x ({2}/{3} días)</value>
+  </data>
+  <data name="Main_Factura_TermoFixoPunta_Texto" xml:space="preserve">
+    <value>P1 (punta)</value>
+  </data>
+  <data name="Main_Factura_TermoFixoVal_Calculo" xml:space="preserve">
+    <value>{0} kW x {1} €/kW e ano x ({2}/{3} días)</value>
+  </data>
+  <data name="Main_Factura_TermoFixoVal_Texto" xml:space="preserve">
+    <value>P3 (val)</value>
+  </data>
+  <data name="Main_Factura_TermoFixo_Texto" xml:space="preserve">
+    <value>Facturación por potencia contratada ("TERMO FIXO")</value>
+  </data>
+  <data name="Main_Factura_TermoVariableChan_Calculo" xml:space="preserve">
+    <value>{0} kWh x {1} €/kWh</value>
+  </data>
+  <data name="Main_Factura_TermoVariableChan_Texto" xml:space="preserve">
+    <value>P2 (chan)</value>
+  </data>
+  <data name="Main_Factura_TermoVariableCusteEnerxia_Calculo" xml:space="preserve">
+    <value>({0} prezos diferentes, sen desglose)</value>
+  </data>
+  <data name="Main_Factura_TermoVariableCusteEnerxia_Texto" xml:space="preserve">
+    <value>Custes da enerxía</value>
+  </data>
+  <data name="Main_Factura_TermoVariablePeaxesTDC_Texto" xml:space="preserve">
+    <value>Importe por peaxes de transporte e distribución e cargos</value>
+  </data>
+  <data name="Main_Factura_TermoVariablePunta_Calculo" xml:space="preserve">
+    <value>{0} kWh x {1} €/kWh</value>
+  </data>
+  <data name="Main_Factura_TermoVariablePunta_Texto" xml:space="preserve">
+    <value>P1 (punta)</value>
+  </data>
+  <data name="Main_Factura_TermoVariableVal_Calculo" xml:space="preserve">
+    <value>{0} kWh x {1} €/kWh</value>
+  </data>
+  <data name="Main_Factura_TermoVariableVal_Texto" xml:space="preserve">
+    <value>P3 (val)</value>
+  </data>
+  <data name="Main_Factura_TermoVariable_Texto" xml:space="preserve">
+    <value>Facturación por enerxía consumida ("TERMO VARIABLE")</value>
+  </data>
+  <data name="Main_Factura_Total_Texto" xml:space="preserve">
+    <value>TOTAL IMPORTE FACTURA</value>
+  </data>
+  <data name="Main_Factura_Titulo_Texto" xml:space="preserve">
+    <value>FACTURA DE ELECTRICIDADE. Período de consumo: {0} a {1} (o día inicial está excluído)</value>
+  </data>
+  <data name="Txt_ArquivosAtopadosBuscandoDatas" xml:space="preserve">
+    <value>
+- Arquivos atopados. Comprobando se conteñen as datas requiridas...</value>
+  </data>
+  <data name="Txt_ArquivosNonAtopadosDescargando" xml:space="preserve">
+    <value>
+- Arquivo non atopado. Procedendo coa descarga...</value>
   </data>
 </root>

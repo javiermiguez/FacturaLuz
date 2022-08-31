@@ -9,44 +9,100 @@
     mc:Ignorable="d">
     <Page.Resources>
         <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+        <helpers:DecimalConverter x:Key="DecimalConverter" />
     </Page.Resources>
-    <Grid>
-        <StackPanel
-            x:Name="ContentArea">
-            <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
-                <TextBox x:Uid="Settings_UrlMedidor" Name="UrlMedidor"
-                         Text="{x:Bind ViewModel.UrlMedidor, Mode=TwoWay}"/>
-                <TextBlock x:Uid="Settings_Theme" Margin="{StaticResource XSmallTopMargin}" FontSize="15"/>
-                <StackPanel Margin="{StaticResource XSmallTopMargin}">
-                    <RadioButton
-                        x:Uid="Settings_Theme_Light"
-                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                        IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}"
-                        GroupName="AppTheme">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Light</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
-                    <RadioButton
-                        x:Uid="Settings_Theme_Dark"
-                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                        IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}"
-                        GroupName="AppTheme">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Dark</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
-                    <RadioButton
-                        x:Uid="Settings_Theme_Default"
-                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                        IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}"
-                        GroupName="AppTheme">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Default</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
-                </StackPanel>
+    <RelativePanel>
+        <TextBox x:Uid="Settings_UrlMedidor" Name="UrlMedidor" MinWidth="300" Text="{x:Bind ViewModel.UrlMedidor, Mode=TwoWay}" GotFocus="TextBox_GotFocus"/>
+
+        <TextBox x:Uid="Settings_PotenciaContratada" Name="PotenciaContratada" RelativePanel.RightOf="UrlMedidor" Margin="10,0,0,0"
+                 Text="{x:Bind ViewModel.PotenciaContratada, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus">
+            <TextBox.HeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Foreground="SteelBlue" />
+                </DataTemplate>
+            </TextBox.HeaderTemplate>
+        </TextBox>
+
+        <StackPanel Name="MarcoBonoSocial" BorderThickness="1" BorderBrush="{ThemeResource ComboBoxBorderThemeBrush}" CornerRadius="{ThemeResource ControlCornerRadius}"
+                    RelativePanel.Below="PotenciaContratada" Padding="10,10,10,10" Margin="0,15,0,0">
+            <TextBlock x:Uid="Settings_TituloBonoSocial"/>
+            <Border Height="1" Background="{ThemeResource ComboBoxBorderThemeBrush}" Margin="0,5,0,10"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Uid="Settings_DescontoBonoSocial" Name="DescontoBonoSocial"
+                         Text="{x:Bind ViewModel.DescontoBonoSocial, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus"/>
+                <TextBox x:Uid="Settings_LimiteBonoSocial" Name="LimiteBonoSocial" Margin="10,0,0,0"
+                         Text="{x:Bind ViewModel.LimiteBonoSocial, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus">
+                    <TextBox.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" Foreground="SteelBlue" />
+                        </DataTemplate>
+                    </TextBox.HeaderTemplate>
+                </TextBox>
             </StackPanel>
         </StackPanel>
-    </Grid>
+        
+        <StackPanel Name="MarcoPeaxes" BorderThickness="1" BorderBrush="{ThemeResource ComboBoxBorderThemeBrush}" CornerRadius="{ThemeResource ControlCornerRadius}"
+                    RelativePanel.RightOf="MarcoBonoSocial" RelativePanel.Below="UrlMedidor" Padding="10,10,10,10" Margin="10,15,0,0">
+            <TextBlock x:Uid="Settings_TituloPeaxes"/>
+            <Border Height="1" Background="{ThemeResource ComboBoxBorderThemeBrush}" Margin="0,5,0,10"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Uid="Settings_PeaxesTDCPunta" Name="PeaxesTDCPunta" Text="{x:Bind ViewModel.TermoFixoPeaxesTDCPunta, Mode=TwoWay, Converter={StaticResource DecimalConverter}}"
+                         GotFocus="TextBox_GotFocus"/>
+                <TextBox x:Uid="Settings_PeaxesTDCVal" Name="PeaxesTDCVal" Margin="10,0,0,0"
+                         Text="{x:Bind ViewModel.TermoFixoPeaxesTDCVal, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus"/>
+            </StackPanel>
+        </StackPanel>
+        
+        <TextBox x:Uid="Settings_MarxeComercializacion" Name="MarxeComercializacion" RelativePanel.Below="MarcoBonoSocial" Margin="0,10,0,0"
+                 Text="{x:Bind ViewModel.MarxeComercializacion, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus"/>
+        <TextBox x:Uid="Settings_AlugueiroContador" Name="AlugueiroContador"
+                 RelativePanel.RightOf="MarxeComercializacion" RelativePanel.Below="MarcoBonoSocial" Margin="10,10,0,0"
+                 Text="{x:Bind ViewModel.AlugueiroContador, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus">
+            <TextBox.HeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Foreground="SteelBlue" />
+                </DataTemplate>
+            </TextBox.HeaderTemplate>
+        </TextBox>
+        <TextBox x:Uid="Settings_ImpostoElectricidade" Name="ImpostoElectricidade"
+                 RelativePanel.RightOf="AlugueiroContador" RelativePanel.Below="MarcoBonoSocial" Margin="10,10,0,0"
+                 Text="{x:Bind ViewModel.ImpostoElectricidade, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus"/>
+        <TextBox x:Uid="Settings_Ive" Name="Ive"
+                 RelativePanel.RightOf="ImpostoElectricidade" RelativePanel.Below="MarcoBonoSocial" Margin="10,10,0,0"
+                 Text="{x:Bind ViewModel.Ive, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus"/>
+
+        <StackPanel Name="MarcoTema" BorderThickness="1" BorderBrush="{ThemeResource ComboBoxBorderThemeBrush}" CornerRadius="{ThemeResource ControlCornerRadius}"
+                    RelativePanel.Below="MarxeComercializacion" Padding="10,10,10,10" Margin="0,15,0,0">
+            <TextBlock x:Uid="Settings_Theme"/>
+            <Border Height="1" Background="{ThemeResource ComboBoxBorderThemeBrush}" Margin="0,5,0,0"/>
+            <StackPanel Margin="{StaticResource XSmallTopMargin}">
+                <RadioButton x:Uid="Settings_Theme_Light" Command="{x:Bind ViewModel.SwitchThemeCommand}" GroupName="AppTheme"
+                            IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}">
+                    <RadioButton.CommandParameter>
+                        <xaml:ElementTheme>Light</xaml:ElementTheme>
+                    </RadioButton.CommandParameter>
+                </RadioButton>
+                <RadioButton x:Uid="Settings_Theme_Dark" Command="{x:Bind ViewModel.SwitchThemeCommand}" GroupName="AppTheme"
+                            IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}">
+                    <RadioButton.CommandParameter>
+                        <xaml:ElementTheme>Dark</xaml:ElementTheme>
+                    </RadioButton.CommandParameter>
+                </RadioButton>
+                <RadioButton x:Uid="Settings_Theme_Default" Command="{x:Bind ViewModel.SwitchThemeCommand}" GroupName="AppTheme"
+                            IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}">
+                    <RadioButton.CommandParameter>
+                        <xaml:ElementTheme>Default</xaml:ElementTheme>
+                    </RadioButton.CommandParameter>
+                </RadioButton>
+            </StackPanel>
+        </StackPanel>
+
+        <ToggleSwitch x:Uid="Settings_InterruptorAxuda" Name="AxudaToggleSwitch" Margin="0,10,0,0" RelativePanel.Below="MarcoTema"/>
+        <TeachingTip x:Uid="Settings_AxudaTeachingTip" Name="AxudaTeachingTip" PreferredPlacement="Bottom" IsLightDismissEnabled="True">
+            <TeachingTip.IconSource>
+                <FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe946;"/>
+            </TeachingTip.IconSource>
+        </TeachingTip>
+
+    </RelativePanel>
 </Page>
