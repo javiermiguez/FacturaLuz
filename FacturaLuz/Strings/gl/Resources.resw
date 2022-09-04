@@ -221,7 +221,7 @@ Exemplo: http://192.168.1.128/</value>
   </data>
   <data name="Txt_DescargaCompletada" xml:space="preserve">
     <value>
-- Descarga completada.</value>
+- Descarga do arquivo {0} completada.</value>
   </data>
   <data name="Txt_ErroDescarga" xml:space="preserve">
     <value>
@@ -397,6 +397,10 @@ Se a factura se paga entre varios, dividir este valor entre o número de pagador
   </data>
   <data name="Txt_ArquivosNonAtopadosDescargando" xml:space="preserve">
     <value>
-- Arquivo non atopado. Procedendo coa descarga...</value>
+- Arquivos non atopados. Procedendo coa descarga...</value>
+  </data>
+  <data name="Txt_ArquivosEliminadosDescargando" xml:space="preserve">
+    <value>
+- Arquivos eliminados. Procedendo coa descarga dos arquivos...</value>
   </data>
 </root>

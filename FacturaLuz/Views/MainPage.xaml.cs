@@ -44,11 +44,61 @@ public sealed partial class MainPage : Page
         {
             get; set;
         }
+        public decimal PeaxeWatioHora
+        {
+            get; set;
+        }
+        public int Periodo
+        {
+            get; set;
+        }
+    }
+
+    private class PrezoTotal
+    {
+        public DateTime DataHora
+        {
+            get; set;
+        }
+        public decimal PrezoWatioHora
+        {
+            get; set;
+        }
+    }
+
+    private class PrezoPeaxe
+    {
+        public DateTime DataHora
+        {
+            get; set;
+        }
+        public decimal PeaxeWatioHora
+        {
+            get; set;
+        }
+    }
+
+    private class PeriodoHorario
+    {
+        public DateTime DataHora
+        {
+            get; set;
+        }
+        public int Periodo
+        {
+            get; set;
+        }
     }
 
     private List<Consumo> Consumos;
 
     private List<Prezo> Prezos;
+
+    private List<PrezoTotal> PrezosTotais;
+
+    private List<PrezoPeaxe> PrezosPeaxes;
+
+    private List<PeriodoHorario> PeriodosHorarios;
 
     public MainViewModel ViewModel
     {
@@ -186,7 +236,8 @@ public sealed partial class MainPage : Page
                     url += "/";
                 }
 
-                url += "emeter/1/em_data.csv";
+                const string nomeArquivo = "em_data.csv";
+                url += "emeter/1/" + nomeArquivo;
 
                 var cancellationToken = new CancellationTokenSource();
 
@@ -194,7 +245,7 @@ public sealed partial class MainPage : Page
                 {
                     App.httpClient.DefaultRequestHeaders.Clear();
                     await DescargarArquivoAsync(url, rutaLocal, cancellationToken.Token);
-                    LogInfo.Text += ResourceExtensions.GetLocalized("Txt_DescargaCompletada");
+                    LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_DescargaCompletada"), nomeArquivo);
                 }
                 catch (HttpRequestException e)
                 {
@@ -208,9 +259,12 @@ public sealed partial class MainPage : Page
 
     private async Task ObterPrezosAsync(DateTime dataInicio, DateTime dataFin)
     {
-        var rutaLocalPrezosTotais = ApplicationData.Current.LocalFolder.Path + "\\1001.json";
-        var rutaLocalPrezosPeaxes = ApplicationData.Current.LocalFolder.Path + "\\1876.json";
-        var rutaLocalPeriodos = ApplicationData.Current.LocalFolder.Path + "\\1002.json";
+        const string idArquivoPrezosTotais = "1001";
+        const string idArquivoPrezosPeaxes = "1876";
+        const string idArquivoPeriodos = "1002";
+        var rutaLocalPrezosTotais = ApplicationData.Current.LocalFolder.Path + "\\" + idArquivoPrezosTotais + ".json";
+        var rutaLocalPrezosPeaxes = ApplicationData.Current.LocalFolder.Path + "\\" + idArquivoPrezosPeaxes + ".json";
+        var rutaLocalPeriodos = ApplicationData.Current.LocalFolder.Path + "\\" + idArquivoPeriodos + ".json";
 
         LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_ExistenArquivosPrezos"), rutaLocalPrezosTotais, rutaLocalPrezosPeaxes, rutaLocalPeriodos);
 
@@ -220,7 +274,7 @@ public sealed partial class MainPage : Page
         {
             LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivosAtopadosBuscandoDatas");
 
-            FiltrarPrezos(dataInicio, dataFin, rutaLocalPrezosTotais);
+            FiltrarPrezos(dataInicio, dataFin, rutaLocalPrezosTotais, rutaLocalPrezosPeaxes, rutaLocalPeriodos);
 
             var existeDataInicio = Prezos.Any(p => p.DataHora.Date == dataInicio.Date && p.DataHora.Hour == 0);
             var existeDataFin = Prezos.Any(p => p.DataHora.Date == dataFin.Date && p.DataHora.Hour == 23);
@@ -234,19 +288,21 @@ public sealed partial class MainPage : Page
             {
                 LogInfo.Text += ResourceExtensions.GetLocalized("Txt_DatasNonAtopadas");
                 File.Delete(rutaLocalPrezosTotais);
-                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivoEliminadoDescargando");
+                File.Delete(rutaLocalPrezosPeaxes);
+                File.Delete(rutaLocalPeriodos);
+                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivosEliminadosDescargando");
                 necesarioDescargarArquivos = true;
             }
         }
         else
         {
-            LogInfo.Text += ResourceExtensions.GetLocalized("Txt_ArquivosNonAtopadosDescargando");
+            LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_ArquivosNonAtopadosDescargando"));
             necesarioDescargarArquivos = true;
         }
 
         if (necesarioDescargarArquivos)
         {
-            var url = "https://api.esios.ree.es/indicators/1001?"
+            var baseUrl = "https://api.esios.ree.es/indicators/{0}?"
                 + "start_date=" + dataInicio.Date.Year + "-" + dataInicio.Date.Month + "-" + dataInicio.Date.Day + "T00:00:00&"
                 + "end_date=" + dataFin.Date.Year + "-" + dataFin.Date.Month + "-" + dataFin.Date.Day + "T23:59:59&geo_ids[]=8741";
 
@@ -261,15 +317,24 @@ public sealed partial class MainPage : Page
                 App.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", @"token=""***REMOVED***""");
                 App.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
+                var url = string.Format(baseUrl, idArquivoPrezosTotais);
                 await DescargarArquivoAsync(url, rutaLocalPrezosTotais, cancellationToken.Token);
-                LogInfo.Text += ResourceExtensions.GetLocalized("Txt_DescargaCompletada");
+                LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_DescargaCompletada"), idArquivoPrezosTotais + ".json");
+
+                url = string.Format(baseUrl, idArquivoPrezosPeaxes);
+                await DescargarArquivoAsync(url, rutaLocalPrezosPeaxes, cancellationToken.Token);
+                LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_DescargaCompletada"), idArquivoPrezosPeaxes + ".json");
+
+                url = string.Format(baseUrl, idArquivoPeriodos);
+                await DescargarArquivoAsync(url, rutaLocalPeriodos, cancellationToken.Token);
+                LogInfo.Text += string.Format(ResourceExtensions.GetLocalized("Txt_DescargaCompletada"), idArquivoPeriodos + ".json");
             }
             catch (HttpRequestException e)
             {
                 LogInfo.Text = string.Format(ResourceExtensions.GetLocalized("Txt_ErroDescarga"), e.Message);
             }
 
-            FiltrarPrezos(dataInicio, dataFin, rutaLocalPrezosTotais);
+            FiltrarPrezos(dataInicio, dataFin, rutaLocalPrezosTotais, rutaLocalPrezosPeaxes, rutaLocalPeriodos);
         }
     }
 
@@ -298,19 +363,61 @@ public sealed partial class MainPage : Page
                 .ToList();
     }
 
-    private void FiltrarPrezos(DateTime dataInicio, DateTime dataFin, string rutaLocal)
+    private void FiltrarPrezos(DateTime dataInicio, DateTime dataFin, string rutaLocalPrezosTotais, string rutaLocalPrezosPeaxes, string rutaLocalPeriodos)
     {
-        using var streamReader = new StreamReader(rutaLocal);
-        var jObject = JObject.Parse(streamReader.ReadToEnd());
+        using var streamReaderPrezosTotais = new StreamReader(rutaLocalPrezosTotais);
+        var jObjectPrezosTotais = JObject.Parse(streamReaderPrezosTotais.ReadToEnd());
         
-        Prezos = jObject["indicator"]["values"]
-                .Select(p => new Prezo
-                    {
-                        DataHora = (DateTime)p["datetime"],
-                        PrezoWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US")) / 1000000
-                    })
-                .Where(p => p.DataHora >= dataInicio && p.DataHora <= dataFin)
-                .OrderBy(p => p.DataHora)
+        using var streamReaderPrezosPeaxes = new StreamReader(rutaLocalPrezosPeaxes);
+        var jObjectPrezosPeaxes = JObject.Parse(streamReaderPrezosPeaxes.ReadToEnd());
+
+        using var streamReaderPeriodos = new StreamReader(rutaLocalPeriodos);
+        var jObjectPeriodos = JObject.Parse(streamReaderPeriodos.ReadToEnd());
+
+        var prezosTotais = jObjectPrezosTotais["indicator"]["values"]
+                            .Select(p => new PrezoTotal
+                            {
+                                DataHora = (DateTime)p["datetime"],
+                                PrezoWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US")) / 1000000
+                            })
+                            .Where(p => p.DataHora >= dataInicio && p.DataHora <= dataFin)
+                            .ToList();
+
+        var prezosPeaxes = jObjectPrezosPeaxes["indicator"]["values"]
+                            .Select(p => new PrezoPeaxe
+                            {
+                                DataHora = (DateTime)p["datetime"],
+                                PeaxeWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US")) / 1000000,
+                            })
+                            .Where(p => p.DataHora >= dataInicio && p.DataHora <= dataFin)
+                            .ToList();
+
+        var periodosHorarios = jObjectPeriodos["indicator"]["values"]
+                                .Select(ph => new PeriodoHorario
+                                {
+                                    DataHora = (DateTime)ph["datetime"],
+                                    Periodo = (int)ph["value"]
+                                })
+                                .Where(ph => ph.DataHora >= dataInicio && ph.DataHora <= dataFin)
+                                .ToList();
+
+        Prezos = prezosTotais
+                .Join(prezosPeaxes,
+                      pt => pt.DataHora,
+                      pp => pp.DataHora,
+                      (pt, pp) => new { pt.DataHora, pt.PrezoWatioHora, pp.PeaxeWatioHora })
+                .Select(pt_pp => new { pt_pp.DataHora, pt_pp.PrezoWatioHora, pt_pp.PeaxeWatioHora })
+                .Join(periodosHorarios,
+                      pt_pp => pt_pp.DataHora,
+                      ph => ph.DataHora,
+                      (pt_pp, ph) => new Prezo
+                                        {
+                                            DataHora = pt_pp.DataHora,
+                                            PrezoWatioHora = pt_pp.PrezoWatioHora,
+                                            PeaxeWatioHora = pt_pp.PeaxeWatioHora,
+                                            Periodo = ph.Periodo
+                                        }
+                      )
                 .ToList();
     }
 
@@ -328,17 +435,25 @@ public sealed partial class MainPage : Page
         var ConsumosPrezos = Consumos.Join(Prezos,
                                             c => c.DataHora,
                                             p => p.DataHora,
-                                            (Consumo, Prezo) => new { Consumo.DataHora, Consumo.WatiosHora, Prezo.PrezoWatioHora }
-                                          )
-                                          .ToList();
+                                            (Consumo, Prezo) => new {
+                                                Consumo.DataHora,
+                                                Consumo.WatiosHora,
+                                                Prezo.PrezoWatioHora,
+                                                Prezo.PeaxeWatioHora,
+                                                Prezo.Periodo
+                                            })
+                                     .ToList();
 
         var termoVariableResultado = ConsumosPrezos.Sum(cp => cp.WatiosHora * cp.PrezoWatioHora);
-        var kWhConsumidosPunta = (decimal)0; //ConsumoPrezos.Where(cp => cp.DataHora IN XXX).Sum(cp => cp.WatiosHora);
-        var kWhConsumidosChan = (decimal)0;
-        var kWhConsumidosVal = (decimal)0;
-        var termoVariablePeaxesTDCPuntaResultado = kWhConsumidosPunta * 1;
-        var termoVariablePeaxesTDCChanResultado = kWhConsumidosChan * 1;
-        var termoVariablePeaxesTDCValResultado = kWhConsumidosVal * 1;
+        var kWhConsumidosPunta = ConsumosPrezos.Where(cp => cp.Periodo == 1).Sum(cp => cp.WatiosHora) / 1000;
+        var kWhConsumidosChan = ConsumosPrezos.Where(cp => cp.Periodo == 2).Sum(cp => cp.WatiosHora) / 1000;
+        var kWhConsumidosVal = ConsumosPrezos.Where(cp => cp.Periodo == 3).Sum(cp => cp.WatiosHora) / 1000;
+        var peaxeTDCEuroskWhPunta = ConsumosPrezos.FirstOrDefault(cp => cp.Periodo == 1).PeaxeWatioHora * 1000;
+        var peaxeTDCEuroskWhChan = ConsumosPrezos.FirstOrDefault(cp => cp.Periodo == 2).PeaxeWatioHora * 1000;
+        var peaxeTDCEuroskWhVal = ConsumosPrezos.FirstOrDefault(cp => cp.Periodo == 3).PeaxeWatioHora * 1000;
+        var termoVariablePeaxesTDCPuntaResultado = kWhConsumidosPunta * peaxeTDCEuroskWhPunta;
+        var termoVariablePeaxesTDCChanResultado = kWhConsumidosChan * peaxeTDCEuroskWhChan;
+        var termoVariablePeaxesTDCValResultado = kWhConsumidosVal * peaxeTDCEuroskWhVal;
         var numeroPrezosDiferentes = ConsumosPrezos.Count();
         var custeEnerxiaResultado = termoVariableResultado - termoVariablePeaxesTDCPuntaResultado - termoVariablePeaxesTDCChanResultado - termoVariablePeaxesTDCValResultado;
 
@@ -375,14 +490,14 @@ public sealed partial class MainPage : Page
         EscribirFragmentoFactura(TermoVariable_Resultado, Math.Round(termoVariableResultado, 2));
         EscribirFragmentoFactura(TermoVariablePeaxesTDC_Texto);
         EscribirFragmentoFactura(TermoVariablePunta_Texto);
-        EscribirFragmentoFactura(TermoVariablePunta_Calculo, "?", "?");
-        EscribirFragmentoFactura(TermoVariablePunta_Resultado, "?"); //Math.Round(termoVariablePeaxesTDCPuntaResultado, 2));
+        EscribirFragmentoFactura(TermoVariablePunta_Calculo, Math.Round(kWhConsumidosPunta, 0), peaxeTDCEuroskWhPunta);
+        EscribirFragmentoFactura(TermoVariablePunta_Resultado, Math.Round(termoVariablePeaxesTDCPuntaResultado, 2));
         EscribirFragmentoFactura(TermoVariableChan_Texto);
-        EscribirFragmentoFactura(TermoVariableChan_Calculo, "?", "?");
-        EscribirFragmentoFactura(TermoVariableChan_Resultado, "?"); //Math.Round(termoVariablePeaxesTDCChanResultado, 2));
+        EscribirFragmentoFactura(TermoVariableChan_Calculo, Math.Round(kWhConsumidosChan, 0), peaxeTDCEuroskWhChan);
+        EscribirFragmentoFactura(TermoVariableChan_Resultado, Math.Round(termoVariablePeaxesTDCChanResultado, 2));
         EscribirFragmentoFactura(TermoVariableVal_Texto);
-        EscribirFragmentoFactura(TermoVariableVal_Calculo, "?", "?");
-        EscribirFragmentoFactura(TermoVariableVal_Resultado, "?"); //Math.Round(termoVariablePeaxesTDCValResultado, 2));
+        EscribirFragmentoFactura(TermoVariableVal_Calculo, Math.Round(kWhConsumidosVal, 0), peaxeTDCEuroskWhVal);
+        EscribirFragmentoFactura(TermoVariableVal_Resultado, Math.Round(termoVariablePeaxesTDCValResultado, 2));
         EscribirFragmentoFactura(TermoVariableCusteEnerxia_Texto);
         EscribirFragmentoFactura(TermoVariableCusteEnerxia_Calculo, numeroPrezosDiferentes);
         EscribirFragmentoFactura(TermoVariableCusteEnerxia_Resultado, Math.Round(custeEnerxiaResultado, 2));
