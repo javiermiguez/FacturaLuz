@@ -312,9 +312,15 @@ public sealed partial class MainPage : Page
             {
                 App.httpClient.DefaultRequestHeaders.Clear();
                 App.httpClient.DefaultRequestHeaders.Add("Host", "api.esios.ree.es");
+
+                var esiosApiKey = App.GetService<SettingsViewModel>()?.EsiosApiKey;
+                if (!string.IsNullOrWhiteSpace(esiosApiKey))
+                {
+                    App.httpClient.DefaultRequestHeaders.Add("x-api-key", esiosApiKey);
+                }
+
                 App.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 App.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.esios-api-v2+json"));
-                App.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", @"token=""***REMOVED***""");
                 App.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 var url = string.Format(baseUrl, idArquivoPrezosTotais);

@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml;
 
 using Windows.ApplicationModel;
 using Windows.Storage;
+using Windows.Security.Credentials;
 
 namespace FacturaLuz.ViewModels;
 
@@ -45,6 +46,66 @@ public class SettingsViewModel : ObservableRecipient
                 ApplicationData.Current.LocalSettings.Values["urlMedidor"] = value;
             }
         }
+    }
+
+    private string _esiosApiKey;
+
+    public string EsiosApiKey
+    {
+        get => _esiosApiKey;
+        set
+        {
+            if (SetProperty(ref _esiosApiKey, value))
+            {
+                SaveApiKeyToVault(value);
+            }
+        }
+    }
+
+    private void SaveApiKeyToVault(string key)
+    {
+        try
+        {
+            var vault = new PasswordVault();
+
+            try
+            {
+                var existing = vault.FindAllByResource("FacturaLuz-ESIOS");
+                foreach (var c in existing)
+                {
+                    vault.Remove(c);
+                }
+            }
+            catch
+            {}
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                var cred = new PasswordCredential("FacturaLuz-ESIOS", "esios", key);
+                vault.Add(cred);
+            }
+        }
+        catch
+        {}
+    }
+
+    private static string ReadApiKeyFromVault()
+    {
+        try
+        {
+            var vault = new PasswordVault();
+            var list = vault.FindAllByResource("FacturaLuz-ESIOS");
+            if (list != null && list.Count > 0)
+            {
+                var cred = list[0];
+                cred.RetrievePassword();
+                return cred.Password;
+            }
+        }
+        catch
+        {}
+
+        return null;
     }
 
     private decimal _potenciaContratada;
@@ -212,6 +273,9 @@ public class SettingsViewModel : ObservableRecipient
         ImpostoElectricidade = LerValorConfiguracionComoDecimal("impostoElectricidade");
         AlugueiroContador = LerValorConfiguracionComoDecimal("alugueiroContador");
         Ive = LerValorConfiguracionComoDecimal("ive");
+
+        // Load ESIOS API key from Credential Locker
+        EsiosApiKey = ReadApiKeyFromVault();
     }
 
     private static decimal LerValorConfiguracionComoDecimal(string clave)

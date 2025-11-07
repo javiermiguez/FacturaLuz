@@ -197,6 +197,7 @@
   </data>
   <data name="Settings_URLMedidor_AxudaTeachingTip/Subtitle" xml:space="preserve">
     <value>Enderezo IP do dispositivo medidor ShellyEM. Complétase automaticamente con /emeter/1/em_data.csv
+
 Exemplo: http://192.168.1.128/</value>
   </data>
   <data name="Txt_ArquivoAtopadoBuscandoDatas" xml:space="preserve">
@@ -281,6 +282,7 @@ LOG:
   </data>
   <data name="Settings_LimiteBonoSocial_AxudaTeachingTip/Subtitle" xml:space="preserve">
     <value>Consumo anual bonificable. Todo o que exceda deste límite vai sen desconto. Se non se ten bono social, este valor ignórase.
+
 Se a factura se paga entre varios, dividir este valor entre o número de pagadores. Exemplo: Se corresponde un límite de 1380 kWh e se paga entre dous, gardar aquí 690.</value>
   </data>
   <data name="Settings_MarxeComercializacion_AxudaTeachingTip/Subtitle" xml:space="preserve">
@@ -402,5 +404,13 @@ Se a factura se paga entre varios, dividir este valor entre o número de pagador
   <data name="Txt_ArquivosEliminadosDescargando" xml:space="preserve">
     <value>
 - Arquivos eliminados. Procedendo coa descarga dos arquivos...</value>
+  </data>
+  <data name="Settings_TokenEsios/Header" xml:space="preserve">
+    <value>Token E-SIOS</value>
+  </data>
+  <data name="Settings_TokenEsios_AxudaTeachingTip/Subtitle" xml:space="preserve">
+    <value>Token para operar coa API de E-SIOS, que permite descargar a información dos prezos da electricidade.
+
+Teñen un público dispoñible para probas, pero cambia cada certo tempo, así que é recomendable solicitar un persoal en consultasios@ree.es, indicando o nome e apelidos do solicitante.</value>
   </data>
 </root>

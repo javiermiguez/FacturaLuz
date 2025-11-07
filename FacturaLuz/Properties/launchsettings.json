@@ -1,10 +1,11 @@
-﻿{
-    "profiles": {
-      "FacturaLuz (Package)": {
-        "commandName": "MsixPackage"
-      },
-      "FacturaLuz (Unpackaged)": {
-        "commandName": "Project"
-      }
+{
+  "profiles": {
+    "FacturaLuz (Package)": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": true
+    },
+    "FacturaLuz (Unpackaged)": {
+      "commandName": "Project"
     }
+  }
 }

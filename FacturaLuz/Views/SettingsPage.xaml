@@ -70,9 +70,12 @@
         <TextBox x:Uid="Settings_Ive" Name="Ive"
                  RelativePanel.RightOf="ImpostoElectricidade" RelativePanel.Below="MarcoBonoSocial" Margin="10,10,0,0"
                  Text="{x:Bind ViewModel.Ive, Mode=TwoWay, Converter={StaticResource DecimalConverter}}" GotFocus="TextBox_GotFocus"/>
+        <TextBox x:Uid="Settings_TokenEsios" Name="TokenEsios"
+                 MinWidth="300" RelativePanel.Below="MarxeComercializacion" Margin="0,10,0,0"
+                 Text="{x:Bind ViewModel.EsiosApiKey, Mode=TwoWay}" GotFocus="TextBox_GotFocus" />
 
         <StackPanel Name="MarcoTema" BorderThickness="1" BorderBrush="{ThemeResource ComboBoxBorderThemeBrush}" CornerRadius="{ThemeResource ControlCornerRadius}"
-                    RelativePanel.Below="MarxeComercializacion" Padding="10,10,10,10" Margin="0,15,0,0">
+                    RelativePanel.Below="TokenEsios" Padding="10,10,10,10" Margin="0,15,0,0">
             <TextBlock x:Uid="Settings_Theme"/>
             <Border Height="1" Background="{ThemeResource ComboBoxBorderThemeBrush}" Margin="0,5,0,0"/>
             <StackPanel Margin="{StaticResource XSmallTopMargin}">
