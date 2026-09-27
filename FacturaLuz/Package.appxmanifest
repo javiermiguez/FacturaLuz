@@ -10,7 +10,7 @@
   <Identity
     Name="E57D9656-EF7E-4B99-9F46-6CBD5F88AC53"
     Publisher="CN=Javi"
-    Version="0.1.0.0" />
+    Version="0.1.1.0" />
 
   <Properties>
     <DisplayName>FacturaLuz</DisplayName>

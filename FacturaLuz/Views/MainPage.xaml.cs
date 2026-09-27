@@ -32,7 +32,7 @@ public sealed partial class MainPage : Page
         {
             get; set;
         }
-    }
+    };
 
     private class Prezo
     {
@@ -384,7 +384,7 @@ public sealed partial class MainPage : Page
                             .Select(p => new PrezoTotal
                             {
                                 DataHora = (DateTime)p["datetime"],
-                                PrezoWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US")) / 1000000
+                                PrezoWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.Any, new CultureInfo("en-US")) / 1000000
                             })
                             .Where(p => p.DataHora >= dataInicio && p.DataHora <= dataFin)
                             .ToList();
@@ -393,7 +393,7 @@ public sealed partial class MainPage : Page
                             .Select(p => new PrezoPeaxe
                             {
                                 DataHora = (DateTime)p["datetime"],
-                                PeaxeWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.AllowDecimalPoint, new CultureInfo("en-US")) / 1000000,
+                                PeaxeWatioHora = decimal.Parse((string)p["value"], System.Globalization.NumberStyles.Any, new CultureInfo("en-US")) / 1000000,
                             })
                             .Where(p => p.DataHora >= dataInicio && p.DataHora <= dataFin)
                             .ToList();
